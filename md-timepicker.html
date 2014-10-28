@@ -1,7 +1,28 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
+<!-- Why this ? see http://stackoverflow.com/questions/24947683/polymer-conflict-with-moment-js -->
+<link rel="import" href="imports/moment.html">
 
-<polymer-element name="md-timepicker" noscript>
+<polymer-element name="md-timepicker" attributes="color accent twentyfour">
     <template>
+        <div class="display">
+            <span id="hours">{{hours}}</span>
+            <span>:</span>
+            <span id="minutes">{{minutes}}</span>
+        </div>
+        <div class="keypad">
 
+        </div>
     </template>
+    <script src="bower_components/moment/min/moment.min.js"></script>
+    <script>
+    var now = moment();
+
+    Polymer({
+        color: "#3f51b5",
+        accent: "#ff4081",
+        twentyfour: true,
+        hours: now.hours(),
+        minutes: now.minutes()
+    })
+    </script>
 </polymer-element>
