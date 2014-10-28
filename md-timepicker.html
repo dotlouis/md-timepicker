@@ -2,12 +2,12 @@
 <!-- Why this ? see http://stackoverflow.com/questions/24947683/polymer-conflict-with-moment-js -->
 <link rel="import" href="imports/moment.html">
 
-<polymer-element name="md-timepicker" attributes="color accent twentyfour">
+<polymer-element name="md-timepicker" attributes="colors twentyfour active">
     <template>
         <div class="display">
-            <span id="hours">{{hours}}</span>
+            <span id="hours" on-click="{{selectHours}}">{{hours}}</span>
             <span>:</span>
-            <span id="minutes">{{minutes}}</span>
+            <span id="minutes" on-up="{{selectMinutes}}">{{minutes}}</span>
         </div>
         <div class="keypad">
 
@@ -15,14 +15,32 @@
     </template>
     <script src="bower_components/moment/min/moment.min.js"></script>
     <script>
-    var now = moment();
-
     Polymer({
-        color: "#3f51b5",
-        accent: "#ff4081",
         twentyfour: true,
-        hours: now.hours(),
-        minutes: now.minutes()
+        active: false,
+        created: function() {
+            // create a default colors object for this instance
+            this.colors = {
+                mainColor: '#3f51b5',
+                accentColor: '#ff4081'
+            };
+            var now = moment();
+            this.hours = now.format("HH");
+            this.minutes = now.format("mm");
+            this.currentSelector = "hours";
+        },
+        selectHours: function(event, detail, sender){
+            if(this.currentSelector != "hours"){
+                console.log("switching to hours");
+                this.currentSelector = "hours";
+            }
+        },
+        selectMinutes: function(event, detail, sender){
+            if(this.currentSelector != "minutes"){
+                console.log("switching to minutes");
+                this.currentSelector = "minutes";
+            }
+        }
     })
     </script>
 </polymer-element>
