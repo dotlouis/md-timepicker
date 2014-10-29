@@ -16,5 +16,11 @@
 <body unresolved>
     <!-- 3. Declare the element by its tag. -->
     <md-timepicker></md-timepicker>
+
+    <script>
+    document.querySelector('md-timepicker').addEventListener('time-selected', function(e) {
+        console.log(e.type, e.detail.time); // "time-selected" "some date"
+    });
+    </script>
 </body>
 </html>
