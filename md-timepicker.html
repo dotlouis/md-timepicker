@@ -41,7 +41,13 @@
                 box-sizing: border-box;
                 font-size: 42px;
                 font-weight: 300;
-                padding: 15px 0;
+            }
+            #keypad .digit{
+                flex: 1 0 63px;
+                /* shorthand for
+                flex-grow: 1;
+                flex-shrink: 0;
+                flex-basis: 63px;*/
             }
             .digit{
                 border-radius: 50%;
@@ -62,23 +68,10 @@
                     <paper-ripple fit class="circle recenteringTouch"></paper-ripple>
                 </div>
             </div>
-            <div id="keypad" layout horizontal center-justified>
-                <div layout vertical flex>
-                    <div class="digit">1<paper-ripple fit class="circle recenteringTouch"></paper-ripple></div>
-                    <div class="digit">4<paper-ripple fit class="circle recenteringTouch"></paper-ripple></div>
-                    <div class="digit">7<paper-ripple fit class="circle recenteringTouch"></paper-ripple></div>
-                </div>
-                <div layout vertical flex>
-                    <div class="digit">2<paper-ripple fit class="circle recenteringTouch"></paper-ripple></div>
-                    <div class="digit">5<paper-ripple fit class="circle recenteringTouch"></paper-ripple></div>
-                    <div class="digit">8<paper-ripple fit class="circle recenteringTouch"></paper-ripple></div>
-                    <div class="digit">0<paper-ripple fit class="circle recenteringTouch"></paper-ripple></div>
-                </div>
-                <div layout vertical flex>
-                    <div class="digit">3<paper-ripple fit class="circle recenteringTouch"></paper-ripple></div>
-                    <div class="digit">6<paper-ripple fit class="circle recenteringTouch"></paper-ripple></div>
-                    <div class="digit">9<paper-ripple fit class="circle recenteringTouch"></paper-ripple></div>
-                </div>
+            <div id="keypad" layout horizontal center-justified center wrap flex>
+                <template repeat="{{key in keys}}">
+                    <div class="digit">{{key}}<paper-ripple fit class="circle recenteringTouch"></paper-ripple></div>
+                </template>
             </div>
             <paper-button id="done_button" label="Done"></paper-button>
         </polymer-ui-card>
@@ -98,6 +91,7 @@
             this.hours = now.format("HH");
             this.minutes = now.format("mm");
             this.currentSelector = "hours";
+            this.keys = [1,2,3,4,5,6,7,8,9,0];
         },
         selectHours: function(event, detail, sender){
             if(this.currentSelector != "hours"){
