@@ -6,7 +6,7 @@
 <!-- Why this ? see http://stackoverflow.com/questions/24947683/polymer-conflict-with-moment-js -->
 <link rel="import" href="imports/moment.html">
 
-<polymer-element name="md-timepicker" attributes="colors twentyfour active">
+<polymer-element name="md-timepicker" attributes="color">
     <template>
         <style>
             *{
@@ -29,10 +29,9 @@
                 box-sizing: border-box;
                 height: 120px;
                 padding: 24px;
-                color: rgb(255, 255, 255);
+                color: white;
                 font-size: 46px;
                 font-weight: 100;
-                background-color: #5264ae;
             }
             #display .digit{
                 padding: 5px;
@@ -86,7 +85,7 @@
         </style>
         <polymer-ui-card id="polymer_ui_card" layout vertical justified>
 
-            <div id="display" center center-justified horizontal layout>
+            <div id="display" center center-justified horizontal layout style="background-color:{{color}}">
                 <div id="hours" class="digit" on-click="{{selectHours}}" active?="{{currentSelector == selector.HOUR}}">
                     <paper-ripple fit class="circle recenteringTouch"></paper-ripple>
                     {{hours}}
@@ -116,20 +115,8 @@
     <script src="bower_components/moment/min/moment.min.js"></script>
     <script>
     Polymer({
-        twentyfour: true,
-        active: false,
-        publish:{
-            date:{
-                value: undefined,
-                reflect: true
-            }
-        },
+        color: "#5264ae",
         created: function() {
-            // create a default colors object for this instance
-            this.colors = {
-                mainColor: '#5264ae',
-                accentColor: '#ff4081'
-            };
             // Enum for the current selected number
             this.selector = {
                 HOUR : "HOUR",
@@ -255,11 +242,13 @@
         },
         generateDate: function(){
             this.currentSelector = this.selector.DONE;
-            
+
             var today = moment();
             today.hours(this.hours);
             today.minutes(this.minutes);
-            this.date = today;
+            // this.fire('time-selected', {time: today}); // a moment Object
+            // this.fire('time-selected', {time: today.toDate()}); // a Date Object
+            this.fire('time-selected', {time: today.format('HH:mm')}); // a String
         },
         clearDisplay: function(){
             // clear to Now, reset variables and enable eventually disabled keys
