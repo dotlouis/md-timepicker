@@ -1,17 +1,59 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/font-roboto/roboto.html">
+<link rel="import" href="bower_components/polymer-ui-card/polymer-ui-card.html">
+<link rel="import" href="bower_components/paper-ripple/paper-ripple.html">
 <!-- Why this ? see http://stackoverflow.com/questions/24947683/polymer-conflict-with-moment-js -->
 <link rel="import" href="imports/moment.html">
 
 <polymer-element name="md-timepicker" attributes="colors twentyfour active">
     <template>
-        <div class="display">
-            <span id="hours" on-click="{{selectHours}}">{{hours}}</span>
-            <span>:</span>
-            <span id="minutes" on-up="{{selectMinutes}}">{{minutes}}</span>
-        </div>
-        <div class="keypad">
+        <style>
+            *{
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            polymer-ui-card {
+              display: block;
+              height: 400px;
+              width: 250px;
+              margin: 20px auto;
+              font-family: 'RobotoDraft', sans-serif;
+            }
+            #display {
+                box-sizing: border-box;
+                height: 120px;
+                padding: 24px;
+                color: rgb(255, 255, 255);
+                font-size: 46px;
+                background-color: rgb(82, 123, 206);
+            }
+            #display .digit{
+                border-radius: 50%;
+                position: relative;
+                padding: 15px;
+            }
+        </style>
+        <polymer-ui-card id="polymer_ui_card" layout vertical>
 
-        </div>
+            <div id="display" center center-justified horizontal layout>
+                <div id="hours" class="digit" on-click="{{selectHours}}">
+                    {{hours}}
+                    <paper-ripple fit class="circle recenteringTouch"></paper-ripple>
+                </div>
+                <span>:</span>
+                <div id="minutes" class="digit" on-click="{{selectMinutes}}">
+                    {{minutes}}
+                    <paper-ripple fit class="circle recenteringTouch"></paper-ripple>
+                </div>
+            </div>
+            <div class="keypad">
+
+            </div>
+        </polymer-ui-card>
     </template>
     <script src="bower_components/moment/min/moment.min.js"></script>
     <script>
