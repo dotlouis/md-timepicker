@@ -33,7 +33,6 @@
     "moment": "~2.8.3",
     "paper-ripple": "Polymer/paper-ripple#~0.4.2",
     "paper-button": "Polymer/paper-button#~0.4.2",
-    "paper-shadow": "Polymer/paper-shadow#~0.4.2",
-    "font-roboto": "Polymer/font-roboto#~0.4.2"
+    "paper-shadow": "Polymer/paper-shadow#~0.4.2"
   }
 }
