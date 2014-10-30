@@ -1,11 +1,23 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/font-roboto/roboto.html">
-<link rel="import" href="bower_components/polymer-ui-card/polymer-ui-card.html">
 <link rel="import" href="bower_components/paper-ripple/paper-ripple.html">
+<link rel="import" href="bower_components/paper-shadow/paper-shadow.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 <!-- Why this ? see http://stackoverflow.com/questions/24947683/polymer-conflict-with-moment-js -->
 <link rel="import" href="imports/moment.html">
 
+<!--
+Element that let the user input a time easily.
+
+##### Example
+
+    <md-timepicker></md-timepicker>
+
+@element md-timepicker
+@blurb Element that let the user input a time easily.
+@status alpha
+@homepage https://github.com/virtual-dev/md-timepicker
+-->
 <polymer-element name="md-timepicker" attributes="color">
     <template>
         <style>
@@ -17,13 +29,13 @@
                 -ms-user-select: none;
                 user-select: none;
             }
-            polymer-ui-card {
-                display: block;
+            #card {
                 height: 400px;
                 width: 250px;
                 margin: 20px auto;
                 font-family: 'RobotoDraft', 'Helvetica Neue', Helvetica, sans-serif;
                 color: rgba(0,0,0,0.54);
+                background-color: white;
             }
             #display {
                 box-sizing: border-box;
@@ -60,7 +72,7 @@
                 flex-basis: 63px;*/
             }
             #keypad .digit[disabled]{
-                color: rgba(0,0,0,0.26);
+                color: rgba(0,0,0,0.12);
             }
             /* second child because <template></template> comes before */
             #keypad .digit:nth-child(2){
@@ -83,8 +95,8 @@
                 margin: 5px;
             }
         </style>
-        <polymer-ui-card id="polymer_ui_card" layout vertical justified>
-
+        <div id="card" layout vertical justified>
+            <paper-shadow z="2"></paper-shadow>
             <div id="display" center center-justified horizontal layout style="background-color:{{color}}">
                 <div id="hours" class="digit" on-click="{{selectHours}}" active?="{{currentSelector == selector.HOUR}}">
                     <paper-ripple fit class="circle recenteringTouch"></paper-ripple>
@@ -115,6 +127,13 @@
     <script src="bower_components/moment/min/moment.min.js"></script>
     <script>
     Polymer({
+        /**
+        * The `color` attribute sets a background-color for the header
+        *
+        * @attribute color
+        * @type string
+        * @default '#5264ae'
+        */
         color: "#5264ae",
         created: function() {
             // Enum for the current selected number
@@ -153,21 +172,36 @@
                 {value: 9, enabled: true}
             ];
         },
-        // when user clicks on the HOUR part on display we update
-        // corresponding variables and enable eventually disabled keys.
+        /**
+        * The `selectHours` method will focus the hours.
+        *
+        * @method selectHours
+        */
         selectHours: function(event, detail, sender){
+            // when user clicks on the HOUR part on display we update
+            // corresponding variables and enable eventually disabled keys.
             if(this.currentSelector != this.selector.HOUR)
                 this.currentSelector = this.selector.HOUR;
             this.currentCursor = this.cursor.DECADE;
             this.enableKeys();
         },
-        // same here for MINUTE
+        /**
+        * The `selectMinutes` method will focus the minutes.
+        *
+        * @method selectMinutes
+        */
         selectMinutes: function(event, detail, sender){
+            // same here for MINUTE
             if(this.currentSelector != this.selector.MINUTE)
                 this.currentSelector = this.selector.MINUTE;
             this.currentCursor = this.cursor.DECADE;
             this.enableKeys();
         },
+        /**
+        * The `keyPressed` method will input the number to the focused zone
+        *
+        * @method keyPressed
+        */
         keyPressed: function(event, detail, sender){
             // the key emitting the event
             var keyObject = sender.templateInstance.model.key;
@@ -220,6 +254,7 @@
                     else{
                         this.minutes = "0" + key.toString();
                         this.currentSelector = this.selector.DONE;
+                        this.disableKeys(0);
                     }
                 }
                 else if(this.currentCursor == this.cursor.UNIT){
@@ -227,21 +262,49 @@
                     this.minutes = this.minutes.substring(0,1) + key.toString();
                     // we're done
                     this.currentSelector = this.selector.DONE;
+                    this.disableKeys(0);
                 }
             }
         },
+        /**
+        * The `disableKeys` method will disable keys from startKey to 9 (included)
+        *
+        * @method disableKeys
+        * @param {Int} the lowest key to disable.
+        */
         disableKeys: function(startKey){
             // disables key(s) from start to 9 (both included)
             for(var i = startKey; i<10; i++)
                 this.keys[i].enabled = false;
         },
+        /**
+        * The `enableKeys` method will enable all keys
+        *
+        * @method enableKeys
+        */
         enableKeys : function(){
             // (re)enables all keys
             for(var i = 0; i<10; i++)
                 this.keys[i].enabled = true;
         },
+
+        /**
+        * The `time-selected event is fired whenever we
+        * call generateDate.
+        *
+        * @event time-selected
+        * @param {Object} detail
+        *   @param {string} detail.time The time formatted as "HH:mm".
+        */
+
+        /**
+        * The `generateDate` method will fire the time-selected.
+        *
+        * @method generateDate
+        */
         generateDate: function(){
             this.currentSelector = this.selector.DONE;
+            this.disableKeys(0);
 
             var today = moment();
             today.hours(this.hours);
@@ -250,6 +313,12 @@
             // this.fire('time-selected', {time: today.toDate()}); // a Date Object
             this.fire('time-selected', {time: today.format('HH:mm')}); // a String
         },
+        /**
+        * The `clearDisplay` method will reset the display to the actual time,
+        * enable eventually disabled key, and set the focus to the hours
+        *
+        * @method clearDisplay
+        */
         clearDisplay: function(){
             // clear to Now, reset variables and enable eventually disabled keys
             var now = moment();
