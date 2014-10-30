@@ -9,3 +9,7 @@ Inspired by the Android 4.2+ timepicker in the AOSP clock app.
 
 ###Installation
 `bower install md-timepicker`
+
+###[Documentation](http://virtual-dev.github.io/md-timepicker/components/md-timepicker/index.html)
+
+###[Demo](http://virtual-dev.github.io/md-timepicker/components/md-timepicker/demo.html)
