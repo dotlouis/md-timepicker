@@ -19,81 +19,8 @@ Element that let the user input a time easily.
 -->
 <polymer-element name="md-timepicker" attributes="color">
     <template>
-        <style>
-            *{
-                -webkit-touch-callout: none;
-                -webkit-user-select: none;
-                -khtml-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
-            }
-            #card {
-                height: 400px;
-                width: 250px;
-                margin: 20px auto;
-                font-family: 'RobotoDraft', 'Helvetica Neue', Helvetica, sans-serif;
-                color: rgba(0,0,0,0.54);
-                background-color: white;
-            }
-            #display {
-                box-sizing: border-box;
-                height: 120px;
-                padding: 24px;
-                color: white;
-                font-size: 46px;
-                font-weight: 100;
-            }
-            #display .digit{
-                padding: 5px;
-                -webkit-transition: .5s cubic-bezier(1,-1.2,0.2,2);
-                -moz-transition: .5s cubic-bezier(1,-1.2,0.2,2);
-                -o-transition: .5s cubic-bezier(1,-1.2,0.2,2);
-                transition: .5s cubic-bezier(1,-1.2,0.2,2);
-            }
-            #display .digit[active]{
-                -webkit-transform: scale(1.2);
-                -moz-transform: scale(1.2);
-                -o-transform: scale(1.2);
-                -ms-transform: scale(1.2);
-                transform: scale(1.2);
-            }
-            #keypad{
-                box-sizing: border-box;
-                font-size: 42px;
-                font-weight: 300;
-            }
-            #keypad .digit{
-                flex: 1 0 63px;
-                /* shorthand for
-                flex-grow: 1;
-                flex-shrink: 0;
-                flex-basis: 63px;*/
-            }
-            #keypad .digit[disabled]{
-                color: rgba(0,0,0,0.12);
-            }
-            /* second child because <template></template> comes before */
-            #keypad .digit:nth-child(2){
-                /* we put the 0 at the bottom */
-                order: 10;
-            }
-            .digit{
-                border-radius: 50%;
-                position: relative;
-                text-align: center;
-            }
-            #button_bar{
-                font-size: 14px;
-            }
-            #done_button{
-                color: #4285f4;
-            }
-            #done_button,
-            #clear_button{
-                margin: 5px;
-            }
-        </style>
+        <link rel="stylesheet" href="md-timepicker.css">
+
         <div id="card" layout vertical justified>
             <paper-shadow z="2"></paper-shadow>
             <div id="display" center center-justified horizontal layout style="background-color:{{color}}">
@@ -124,13 +51,13 @@ Element that let the user input a time easily.
         </polymer-ui-card>
     </template>
     <script>
-    Polymer({
+    Polymer('md-timepicker',{
         /**
-        * The `color` attribute sets a background-color for the header
+        * Sets a background-color for the header
         *
         * @attribute color
         * @type string
-        * @default '#5264ae'
+        * @default #5264ae
         */
         color: "#5264ae",
         created: function() {
@@ -171,7 +98,7 @@ Element that let the user input a time easily.
             ];
         },
         /**
-        * The `selectHours` method will focus the hours.
+        * Focus on the hours
         *
         * @method selectHours
         */
@@ -184,19 +111,19 @@ Element that let the user input a time easily.
             this.enableKeys();
         },
         /**
-        * The `selectMinutes` method will focus the minutes.
+        * Focus on the minutes
         *
         * @method selectMinutes
         */
         selectMinutes: function(event, detail, sender){
-            // same here for MINUTE
+            // same for MINUTE
             if(this.currentSelector != this.selector.MINUTE)
                 this.currentSelector = this.selector.MINUTE;
             this.currentCursor = this.cursor.DECADE;
             this.enableKeys();
         },
         /**
-        * The `keyPressed` method will input the number to the focused zone
+        * Inputs the number to the focused zone
         *
         * @method keyPressed
         */
@@ -265,38 +192,26 @@ Element that let the user input a time easily.
             }
         },
         /**
-        * The `disableKeys` method will disable keys from startKey to 9 (included)
+        * Disables keys from `startKey` to `9` (both included)
         *
         * @method disableKeys
-        * @param {Int} the lowest key to disable.
+        * @param {int} startKey The lowest key to disable
         */
         disableKeys: function(startKey){
-            // disables key(s) from start to 9 (both included)
             for(var i = startKey; i<10; i++)
                 this.keys[i].enabled = false;
         },
         /**
-        * The `enableKeys` method will enable all keys
+        * (Re)enables all keys
         *
         * @method enableKeys
         */
         enableKeys : function(){
-            // (re)enables all keys
             for(var i = 0; i<10; i++)
                 this.keys[i].enabled = true;
         },
-
         /**
-        * The `time-selected event is fired whenever we
-        * call generateDate.
-        *
-        * @event time-selected
-        * @param {Object} detail
-        *   @param {string} detail.time The time formatted as "HH:mm".
-        */
-
-        /**
-        * The `generateDate` method will fire the time-selected.
+        * Fires `time-selected` event
         *
         * @method generateDate
         */
@@ -312,8 +227,8 @@ Element that let the user input a time easily.
             this.fire('time-selected', {time: today.format('HH:mm')}); // a String
         },
         /**
-        * The `clearDisplay` method will reset the display to the actual time,
-        * enable eventually disabled key, and set the focus to the hours
+        * Resets the display to the actual time,
+        * enables eventually disabled key, and sets focus to the hours
         *
         * @method clearDisplay
         */
@@ -326,6 +241,14 @@ Element that let the user input a time easily.
             this.currentCursor = this.cursor.DECADE;
             this.enableKeys();
         }
-    })
+
+        /**
+        * Fired whenever we call `generateDate()`
+        *
+        * @event time-selected
+        * @param {Object} detail
+        *   @param {string} detail.time The time formatted as "HH:mm"
+        */
+    });
     </script>
 </polymer-element>
