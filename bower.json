@@ -1,0 +1,7 @@
+{
+  "name": "md-timepicker#gh-pages",
+  "private": true,
+  "dependencies": {
+    "md-timepicker": "virtual-dev/md-timepicker#master"
+  }
+}

@@ -1,0 +1,254 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../paper-shadow/paper-shadow.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<!-- Why this ? see http://stackoverflow.com/questions/24947683/polymer-conflict-with-moment-js -->
+<link rel="import" href="imports/moment.html">
+
+<!--
+Element that let the user input a time easily.
+
+##### Example
+
+    <md-timepicker></md-timepicker>
+
+@element md-timepicker
+@blurb Element that let the user input a time easily.
+@status alpha
+@homepage https://github.com/virtual-dev/md-timepicker
+-->
+<polymer-element name="md-timepicker" attributes="color">
+    <template>
+        <link rel="stylesheet" href="md-timepicker.css">
+
+        <div id="card" layout vertical justified>
+            <paper-shadow z="2"></paper-shadow>
+            <div id="display" center center-justified horizontal layout style="background-color:{{color}}">
+                <div id="hours" class="digit" on-click="{{selectHours}}" active?="{{currentSelector == selector.HOUR}}">
+                    <paper-ripple fit class="circle recenteringTouch"></paper-ripple>
+                    {{hours}}
+                </div>
+                <span>:</span>
+                <div id="minutes" class="digit" on-click="{{selectMinutes}}" active?="{{currentSelector == selector.MINUTE}}">
+                    {{minutes}}
+                    <paper-ripple fit class="circle recenteringTouch"></paper-ripple>
+                </div>
+            </div>
+            <div id="keypad" layout horizontal center-justified center wrap flex>
+                <template repeat="{{key in keys}}">
+                    <div class="digit" disabled?="{{!key.enabled}}" on-click="{{keyPressed}}">
+                        {{key.value}}
+                        <template if="{{key.enabled}}">
+                            <paper-ripple fit class="circle recenteringTouch"></paper-ripple>
+                        </template>
+                    </div>
+                </template>
+            </div>
+            <div id="button_bar" layout horizontal justified>
+                <paper-button id="clear_button" label="Clear" on-click="{{clearDisplay}}"></paper-button>
+                <paper-button id="done_button" label="Done" on-click="{{generateDate}}" autofocus?="{{currentSelector == selector.DONE}}"></paper-button>
+            </div>
+        </polymer-ui-card>
+    </template>
+    <script>
+    Polymer('md-timepicker',{
+        /**
+        * Sets a background-color for the header
+        *
+        * @attribute color
+        * @type string
+        * @default #5264ae
+        */
+        color: "#5264ae",
+        created: function() {
+            // Enum for the current selected number
+            this.selector = {
+                HOUR : "HOUR",
+                MINUTE : "MINUTE",
+                DONE : "DONE"
+            }
+            // Start with HOUR
+            this.currentSelector = this.selector.HOUR;
+
+            // Enum for the current selected digit inside a number
+            this.cursor = {
+                DECADE : "DECADE",
+                UNIT : "UNIT"
+            }
+            // Start with the leftmost digit (DECADE)
+            this.currentCursor = this.cursor.DECADE;
+
+            // initialize the displayed time to Now
+            var now = moment();
+            this.hours = now.format("HH");
+            this.minutes = now.format("mm");
+
+            // list ok keys on the keyad
+            this.keys = [
+                {value: 0, enabled: true},
+                {value: 1, enabled: true},
+                {value: 2, enabled: true},
+                {value: 3, enabled: true},
+                {value: 4, enabled: true},
+                {value: 5, enabled: true},
+                {value: 6, enabled: true},
+                {value: 7, enabled: true},
+                {value: 8, enabled: true},
+                {value: 9, enabled: true}
+            ];
+        },
+        /**
+        * Focus on the hours
+        *
+        * @method selectHours
+        */
+        selectHours: function(event, detail, sender){
+            // when user clicks on the HOUR part on display we update
+            // corresponding variables and enable eventually disabled keys.
+            if(this.currentSelector != this.selector.HOUR)
+                this.currentSelector = this.selector.HOUR;
+            this.currentCursor = this.cursor.DECADE;
+            this.enableKeys();
+        },
+        /**
+        * Focus on the minutes
+        *
+        * @method selectMinutes
+        */
+        selectMinutes: function(event, detail, sender){
+            // same for MINUTE
+            if(this.currentSelector != this.selector.MINUTE)
+                this.currentSelector = this.selector.MINUTE;
+            this.currentCursor = this.cursor.DECADE;
+            this.enableKeys();
+        },
+        /**
+        * Inputs the number to the focused zone
+        *
+        * @method keyPressed
+        */
+        keyPressed: function(event, detail, sender){
+            // the key emitting the event
+            var keyObject = sender.templateInstance.model.key;
+            var key = sender.templateInstance.model.key.value;
+
+            // if pressed key is disabled stop here
+            if(!keyObject.enabled)
+                return;
+
+            if(this.currentSelector == this.selector.HOUR){
+                if(this.currentCursor == this.cursor.DECADE){
+                    // if first HOUR digit is 2 we disable keys from 4 because
+                    // maximum HOUR is 24
+                    if(key == 2)
+                        this.disableKeys(4);
+                    // if first HOUR digit is 0 or 1 or 2 we clear the second
+                    // digit to 0 to show user which digit is focused next
+                    if(key < 3){
+                        this.hours = key.toString() + "0";
+                        this.currentCursor = this.cursor.UNIT;
+                    }
+                    // if first key pressed is 3 or more we consider it's the
+                    // second digit automatically so we put a 0 on the first digit
+                    else{
+                        this.hours = "0" + key.toString();
+                        this.currentSelector = this.selector.MINUTE;
+                    }
+                }
+                else if(this.currentCursor == this.cursor.UNIT){
+                    // for second HOUR digit we keep the first digit intact
+                    this.hours = this.hours.substring(0,1) + key.toString();
+                    // then we move to the first digit of MINUTE
+                    this.currentSelector = this.selector.MINUTE;
+                    this.currentCursor = this.cursor.DECADE;
+                    // enable eventually disabled keys
+                    this.enableKeys();
+                }
+            }
+            else if(this.currentSelector == this.selector.MINUTE){
+                if(this.currentCursor == this.cursor.DECADE){
+                    // if first MINUTE digit is less than 6 we clear the second
+                    // digit to 0 to show user which digit is focused next
+                    // manimum MINUTE beeing 59
+                    if(key < 6){
+                        this.minutes = key.toString() + "0";
+                        this.currentCursor = this.cursor.UNIT;
+                    }
+                    // if first key pressed is 6 or more we consider it's the
+                    // second digit automatically so we put a 0 on the first digit
+                    else{
+                        this.minutes = "0" + key.toString();
+                        this.currentSelector = this.selector.DONE;
+                        this.disableKeys(0);
+                    }
+                }
+                else if(this.currentCursor == this.cursor.UNIT){
+                    // for second MINUTE digit we keep the first digit intact
+                    this.minutes = this.minutes.substring(0,1) + key.toString();
+                    // we're done
+                    this.currentSelector = this.selector.DONE;
+                    this.disableKeys(0);
+                }
+            }
+        },
+        /**
+        * Disables keys from `startKey` to `9` (both included)
+        *
+        * @method disableKeys
+        * @param {int} startKey The lowest key to disable
+        */
+        disableKeys: function(startKey){
+            for(var i = startKey; i<10; i++)
+                this.keys[i].enabled = false;
+        },
+        /**
+        * (Re)enables all keys
+        *
+        * @method enableKeys
+        */
+        enableKeys : function(){
+            for(var i = 0; i<10; i++)
+                this.keys[i].enabled = true;
+        },
+        /**
+        * Fires `time-selected` event
+        *
+        * @method generateDate
+        */
+        generateDate: function(){
+            this.currentSelector = this.selector.DONE;
+            this.disableKeys(0);
+
+            var today = moment();
+            today.hours(this.hours);
+            today.minutes(this.minutes);
+            // this.fire('time-selected', {time: today}); // a moment Object
+            // this.fire('time-selected', {time: today.toDate()}); // a Date Object
+            this.fire('time-selected', {time: today.format('HH:mm')}); // a String
+        },
+        /**
+        * Resets the display to the actual time,
+        * enables eventually disabled key, and sets focus to the hours
+        *
+        * @method clearDisplay
+        */
+        clearDisplay: function(){
+            // clear to Now, reset variables and enable eventually disabled keys
+            var now = moment();
+            this.hours = now.format("HH");
+            this.minutes = now.format("mm");
+            this.currentSelector = this.selector.HOUR;
+            this.currentCursor = this.cursor.DECADE;
+            this.enableKeys();
+        }
+
+        /**
+        * Fired whenever we call `generateDate()`
+        *
+        * @event time-selected
+        * @param {Object} detail
+        *   @param {string} detail.time The time formatted as "HH:mm"
+        */
+    });
+    </script>
+</polymer-element>
