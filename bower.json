@@ -17,7 +17,8 @@
     "design",
     "paper",
     "web",
-    "component"
+    "component",
+    "web-components"
   ],
   "license": "MIT",
   "ignore": [
